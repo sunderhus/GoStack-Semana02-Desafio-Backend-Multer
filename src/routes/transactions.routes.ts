@@ -26,7 +26,12 @@ transactionsRouter.post('/', async (request, response) => {
 
   const createTransaction = new CreateTransactionService();
 
-  const transaction = await createTransaction.execute({ title, value, type, category });
+  const transaction = await createTransaction.execute({
+    title,
+    value,
+    type,
+    category,
+  });
 
   return response.json(transaction);
 });
@@ -41,13 +46,17 @@ transactionsRouter.delete('/:id', async (request, response) => {
   return response.status(204).send();
 });
 
-transactionsRouter.post('/import', upload.single('file'), async (request, response) => {
-  const importTransaction = new ImportTransactionsService();
-  const filePath = request.file.path;
+transactionsRouter.post(
+  '/import',
+  upload.single('file'),
+  async (request, response) => {
+    const importTransaction = new ImportTransactionsService();
+    const filePath = request.file.path;
 
-  const transactions = await importTransaction.execute({ filePath });
+    const transactions = await importTransaction.execute({ filePath });
 
-  return response.json(transactions);
-});
+    return response.json(transactions);
+  },
+);
 
 export default transactionsRouter;
