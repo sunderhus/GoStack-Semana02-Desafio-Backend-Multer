@@ -1,5 +1,5 @@
 import fs from 'fs';
-import csvParse from 'csv-parse'
+import csvParse from 'csv-parse';
 import path from 'path';
 import { getCustomRepository, getRepository, In } from 'typeorm';
 
@@ -14,10 +14,10 @@ interface RequestDTO {
   filePath: string;
 }
 interface CSVTransaction {
-  title: string,
-  type: 'income' | 'outcome',
-  value: number,
-  category: string
+  title: string;
+  type: 'income' | 'outcome';
+  value: number;
+  category: string;
 }
 
 class ImportTransactionsService {
@@ -45,43 +45,43 @@ class ImportTransactionsService {
       transactions.push({ title, type, value, category });
     });
 
-
-
     await new Promise(resolve => {
       parseFile.on('end', resolve);
-    })
+    });
 
     // get all existent categories
     const existentCategories = await categoriesRepository.find();
-    const existentCategoriesTitles = (await categoriesRepository
-      .find())
-      .map((category: Category) => category.title);
+    const existentCategoriesTitles = (await categoriesRepository.find()).map(
+      (category: Category) => category.title,
+    );
 
     // before filter, get only unique values, then, filter to get only new titles
-    const uniqueCategories = Array
-      .from(new Set(categories))
-      .filter(category => !existentCategoriesTitles.includes(category));
+    const uniqueCategories = Array.from(new Set(categories)).filter(
+      category => !existentCategoriesTitles.includes(category),
+    );
 
     const newCategories = categoriesRepository.create(
       uniqueCategories.map(title => ({
         title,
-      }))
-    )
+      })),
+    );
 
     await categoriesRepository.save(newCategories);
 
-    const allCategories = [...newCategories, ...existentCategories]
+    const allCategories = [...newCategories, ...existentCategories];
 
     const createdTransactions = transactionsRepository.create(
-      transactions.map(({ title, type, value, category: transactionCategory }) => ({
-        title,
-        type,
-        value,
-        category: allCategories.find(
-          category => category.title === transactionCategory
-        )
-      }))
-    )
+      transactions.map(
+        ({ title, type, value, category: transactionCategory }) => ({
+          title,
+          type,
+          value,
+          category: allCategories.find(
+            category => category.title === transactionCategory,
+          ),
+        }),
+      ),
+    );
 
     await transactionsRepository.save(createdTransactions);
 
