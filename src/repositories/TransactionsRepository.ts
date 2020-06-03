@@ -44,8 +44,11 @@ class TransactionsRepository extends Repository<Transaction> {
   }
 
   public async getTransactions(page: number): Promise<Transaction[]> {
-    const transactions = this.find({ skip: (page - 1) * 10, take: 10 });
-
+    const transactions = await this.find({
+      skip: (page - 1) * 10,
+      take: 10,
+      order: { created_at: 'DESC' },
+    });
     return transactions;
   }
 }
