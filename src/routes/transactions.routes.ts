@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { getCustomRepository } from 'typeorm';
 import multer from 'multer';
 
@@ -12,11 +12,19 @@ import uploadConfig from '../config/upload';
 const transactionsRouter = Router();
 const upload = multer(uploadConfig);
 
-transactionsRouter.get('/', async (request, response) => {
+transactionsRouter.get('/', async (request: Request, response: Response) => {
+  const { page = 1 } = request.query;
+
   const transactionRepository = getCustomRepository(TransactionsRepository);
 
-  const transactions = await transactionRepository.find();
+  const count = String(await transactionRepository.count());
+
+  const transactions = await transactionRepository.getTransactions(
+    Number(page),
+  );
   const balance = await transactionRepository.getBalance();
+
+  response.header('X-Total-Count', count);
 
   return response.json({ transactions, balance });
 });
