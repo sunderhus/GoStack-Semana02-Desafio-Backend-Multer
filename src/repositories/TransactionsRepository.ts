@@ -42,6 +42,15 @@ class TransactionsRepository extends Repository<Transaction> {
       total: income - outcome,
     };
   }
+
+  public async getTransactions(page: number): Promise<Transaction[]> {
+    const transactions = await this.find({
+      skip: (page - 1) * 10,
+      take: 10,
+      order: { created_at: 'DESC' },
+    });
+    return transactions;
+  }
 }
 
 export default TransactionsRepository;

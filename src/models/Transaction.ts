@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 
 import Category from './Category';
+
 @Entity('transactions')
 class Transaction {
   @PrimaryGeneratedColumn()
@@ -22,7 +23,6 @@ class Transaction {
 
   @Column('decimal')
   value: number;
-
 
   @ManyToOne(() => Category, category => category.transaction, { eager: true })
   @JoinColumn({ name: 'category_id' })
